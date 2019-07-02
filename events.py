@@ -84,8 +84,6 @@ def update_local_time_from_internet(pyportal, timezone="Etc/UTC", debug=False):
     faster startup time while reloading code.
 
     TODO NZ: Figure out why timezone doesn't match https://pythonclock.org/
-    TODO NZ: The pyportal library clobbers all exceptions, and sleeps.
-        Rewrite for better error handling.
 
     Args:
         pyportal (adafruit_pyportal.PyPortal): PyPortal instance.
@@ -102,7 +100,7 @@ def update_local_time_from_internet(pyportal, timezone="Etc/UTC", debug=False):
         print("Debug mode. Using cached localtime.")
     else:
         print("Trying to update local time from internet.")
-        pyportal.get_local_time(location=timezone)
+        pyportal.get_local_time(location=timezone, reraise_exceptions=True)
 
     time_now = time.monotonic()
     print("Time last refreshed at", time_now)

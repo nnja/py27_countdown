@@ -74,7 +74,11 @@ If you run into issues with the code or the PyPortal, I recommend using the late
 
 ### Libraries
 
-The following libraries, compatible with CircuitPython 4.0.1 are required to be present in the `lib` directory. [Download the library bundle](https://circuitpython.org/libraries).
+For now, use the `adafruit_pyportal.py` library in the `lib` directory of this repository.
+
+The rest of the libraries listed below are compatible with CircuitPython 4.0.1 and are required to be present in the `lib` directory.
+
+[Download the library bundle](https://circuitpython.org/libraries).
 
  - `adafruit_bus_device`
  - `adafruit_bitmap_font`
