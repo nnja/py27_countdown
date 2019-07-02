@@ -2,7 +2,6 @@
 
 Author: Nina Zakharenko
 """
-
 import time
 
 DEBUG = True
@@ -58,7 +57,7 @@ def get_last_touched_point(touchscreen):
     return touch_point
 
 
-def touched_sides(touchscreen, left_x_boundary=110, right_x_boundary=240):
+def sides_touched_on(touchscreen, left_x_boundary=110, right_x_boundary=240):
     """
     Given a Touchscreen instance, determine if either the
     left or the right side of the screen was touched.

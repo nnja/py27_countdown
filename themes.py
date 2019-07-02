@@ -224,6 +224,7 @@ class ThemeManager:
 
     def __init__(self, themes):
         self.themes = themes
+        self.current_theme = None
 
     def initialize(self, pyportal):
         """
@@ -234,7 +235,6 @@ class ThemeManager:
                 A PyPortal instance.
         """
         self.current_pos = 0
-        self.current_theme = None
         self._switch_themes(pyportal)
 
         print("Setting initial theme.")
