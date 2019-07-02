@@ -265,6 +265,16 @@ class ThemeManager:
 
         print("Switching to previous theme.")
 
+    def update_time(self, days_left, hours_left, mins_left):
+        """Update the time displayed on the current theme.
+
+        Args:
+            days_left (int): Days left in the countdown.
+            hours_left (int): Hours left in the countdown.
+            mins_left (int): Minutes left in the countdown.
+        """
+        self.current_theme.update_time(days_left, hours_left, mins_left)
+
     def _switch_themes(self, pyportal):
         next_theme = self.themes[self.current_pos]
 

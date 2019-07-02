@@ -35,7 +35,8 @@ while True:
 
     time_remaining = events.time_remaining(event_time)
     days_left, hours_left, mins_left = events.time_periods_in_epoch(time_remaining)
-    themes.current_theme.update_time(days_left, hours_left, mins_left)
+    themes.update_time(days_left, hours_left, mins_left)
+
 
     if time_remaining < 0:
         print("Event elapsed! Setting event background, sleeping for 1 hour")
