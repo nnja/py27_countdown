@@ -24,51 +24,60 @@ def handle_touchscreen():
     elif touched_right:
         themes.next_theme(pyportal)
 
-def update_displayed_time_remaining():
+def display_time_remaining():
     time_remaining = events.time_remaining(event_time)
+
+    if time_remaining < 0:  # The event has passed.
+        return False
 
     days_left, hours_left, mins_left = events.time_periods_in_epoch(time_remaining)
     themes.update_time(days_left, hours_left, mins_left)
 
-    return time_remaining
+    return True
 
-def display_no_wifi(e):
-    pyportal.set_background("/bgs/no-wifi.bmp")
+def refresh_pyportal_time_from_internet(pyportal_refreshed_time):
+    if not events.should_refresh_time(event_time, pyportal_refreshed_time):
+        return pyportal_refreshed_time
 
-    print(
-        "Can't fetch time on PyPortal without a valid Wifi connection. "
-        "Sleeping for 1 hour. Error: %s" % e)
+    try:
+        should_display_theme = not pyportal_refreshed_time
+        pyportal_refreshed_time = events.update_local_time_from_internet(pyportal)
+    except RuntimeError as e:
+        display_no_wifi(e)
+    else:
+        # Switch from the loading screen to the countdown screen
+        # when PyPortal time is first refreshed from the internet.
+        if should_display_theme:
+            themes.initialize(pyportal)
 
-    while True:
-        time.sleep(60 * 60)  # Sleep for 1 hour in seconds.
+        return pyportal_refreshed_time
 
 def display_event_elapsed():
-    pyportal.set_background("/bgs/final.bmp")
-
     print(
-        "Event elapsed! "
-        "Setting event background, "
-        "sleeping for 1 hour")
+        "Event elapsed! Setting event background, "
+        "and sleeping for 1 hour.")
+
+    pyportal.set_background("/bgs/final.bmp")
 
     while True:
         time.sleep(60 * 60)  # Sleep for 1 hour in seconds.
 
-time_last_refreshed = None
-time_remaining = None
+def display_no_wifi(e):
+    print(
+        "Can't fetch time on PyPortal without a valid WiFi connection. "
+        "Sleeping for 1 hour. Error: {}".format(e))
+
+    pyportal.set_background("/bgs/no-wifi.bmp")
+
+    while True:
+        time.sleep(60 * 60)  # Sleep for 1 hour in seconds.
+
+refreshed_at_time = None
 
 while True:
     handle_touchscreen()
 
-    if events.should_refresh_time(event_time, time_last_refreshed):
-        try:
-            time_last_refreshed = events.update_local_time_from_internet(pyportal)
+    refreshed_at_time = refresh_pyportal_time_from_internet(refreshed_at_time)
 
-            if not themes.current_theme:
-                themes.initialize(pyportal)
-        except RuntimeError as e:
-            display_no_wifi(e)
-
-    if time_remaining and time_remaining < 0:
+    if not display_time_remaining():
         display_event_elapsed()
-    else:
-        time_remaining = update_displayed_time_remaining()
