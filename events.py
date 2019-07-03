@@ -72,6 +72,7 @@ def should_refresh_time(event_time, last_refresh_time, refresh_after_mins=60):
         print("Won't refresh time: event over.")
         return False
 
+    return False
 
 def update_local_time_from_internet(pyportal, timezone="Etc/UTC", debug=False):
     """
