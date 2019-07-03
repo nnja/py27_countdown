@@ -35,22 +35,22 @@ def display_time_remaining():
 
     return True
 
-def refresh_pyportal_time_from_internet(pyportal_refreshed_time):
-    if not events.should_refresh_time(event_time, pyportal_refreshed_time):
-        return pyportal_refreshed_time
+def update_pyportal_local_time_from_internet(updated_at_time):
+    if not events.should_update_time(event_time, updated_at_time):
+        return updated_at_time
 
     try:
-        should_display_theme = not pyportal_refreshed_time
-        pyportal_refreshed_time = events.update_local_time_from_internet(pyportal)
+        just_turned_on = updated_at_time is None
+        updated_at_time = events.update_local_time_from_internet(pyportal)
     except RuntimeError as e:
         display_no_wifi(e)
     else:
         # Switch from the loading screen to the countdown screen
-        # when PyPortal time is first refreshed from the internet.
-        if should_display_theme:
+        # when PyPortal is just turned on.
+        if just_turned_on:
             themes.initialize(pyportal)
 
-        return pyportal_refreshed_time
+        return updated_at_time
 
 def display_event_elapsed():
     print(
@@ -72,12 +72,12 @@ def display_no_wifi(e):
     while True:
         time.sleep(60 * 60)  # Sleep for 1 hour in seconds.
 
-refreshed_at_time = None
+last_updated_at_time = None
 
 while True:
     handle_touchscreen()
 
-    refreshed_at_time = refresh_pyportal_time_from_internet(refreshed_at_time)
+    last_updated_at_time = update_pyportal_local_time_from_internet(last_updated_at_time)
 
     if not display_time_remaining():
         display_event_elapsed()

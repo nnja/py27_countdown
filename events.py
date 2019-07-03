@@ -1,4 +1,4 @@
-"""Calculate time periods, handle PyPortal time refresh from the internet.
+"""Calculate time periods, handle PyPortal time update from the internet.
 
 Some methods based on code from this guide by John Park:
 learn.adafruit.com/pyportal-event-countdown-clock
@@ -30,46 +30,44 @@ def time_periods_in_epoch(epoch):
     return days, hours, mins
 
 
-def should_refresh_time(event_time, last_refresh_time, refresh_after_mins=60):
+def should_update_time(event_time, last_updated_at_time, update_after_mins=60):
     """
-    The clock on the PyPortal drifts, and should be refreshed
+    The clock on the PyPortal drifts, and should be updated
     from the internet periodically for accuracy.
 
-    We want to refresh the local time when:
+    We want to update the local time when:
     - The local time isn't set
-    - After refresh_after_mins have passed
+    - After minutes in update_after_mins have passed
     - If the event time hasn't passed
 
     Args:
         event_time (time.struct_time): Time of the event.
-        last_refresh_time (time.monotonic): Time local time
-            was last refreshed from the internet.
-        refresh_after_mins (int, optional): How many minutes to wait
-            between refreshing from the internet. Defaults to 60.
+        last_updated_at_time (time.monotonic): Time the local time
+            on the PyPortal was last updated from the internet.
+        update_after_mins (int, optional): How many minutes to wait
+            before updating from the internet again. Defaults to 60.
 
     Returns:
-        bool: If the local device time should be refreshed from
+        bool: If the local device time should be updated from
             the internet.
     """
-    just_turned_on = not last_refresh_time
+    just_turned_on = last_updated_at_time is None
     if just_turned_on:
-        print("Refreshing time: PyPortal just turned on.")
+        print("Updating local time: PyPortal just turned on.")
         return True
 
-    time_since_refresh = time.monotonic() - last_refresh_time
-    refresh_time_period_expired = time_since_refresh > refresh_after_mins * 60
-    if refresh_time_period_expired:
+    time_since_update = time.monotonic() - last_updated_at_time
+    is_update_needed = time_since_update > update_after_mins * 60
+    if is_update_needed:
         print(
-            "Refreshing time: last refreshed over {} mins ago.".format(
-                refresh_after_mins
-            )
+            "Updating local time: last updated {} mins ago.".format(update_after_mins)
         )
         return True
 
     remaining_time = time.mktime(event_time) - time.mktime(time.localtime())
     is_event_over = remaining_time and remaining_time < 0
     if is_event_over:
-        print("Won't refresh time: event over.")
+        print("Won't update local time: event is over.")
         return False
 
     return False
@@ -98,13 +96,13 @@ def update_local_time_from_internet(pyportal, timezone="Etc/UTC", debug=False):
     """
     is_rtc_clock_set = rtc.RTC().datetime.tm_year != 2000
     if debug and is_rtc_clock_set:
-        print("Debug mode. Using cached localtime.")
+        print("PyPortal local time: Debug mode. Using cached time.")
     else:
-        print("Trying to update local time from internet.")
+        print("PyPortal local time: Trying to update from internet.")
         pyportal.get_local_time(location=timezone, reraise_exceptions=True)
 
     time_now = time.monotonic()
-    print("Time last refreshed at", time_now)
+    print("PyPortal local time: was last updated at", time_now)
     return time_now
 
 
