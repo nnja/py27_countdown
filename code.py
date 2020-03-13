@@ -29,9 +29,7 @@ while True:
         themes.next_theme(pyportal)
 
     if events.should_refresh_time(event_time, time_last_refreshed):
-        time_last_refreshed = events.update_local_time_from_internet(
-            pyportal, debug=True
-        )
+        time_last_refreshed = events.update_local_time_from_internet(pyportal)
 
     time_remaining = events.time_remaining(event_time)
     days_left, hours_left, mins_left = events.time_periods_in_epoch(time_remaining)
